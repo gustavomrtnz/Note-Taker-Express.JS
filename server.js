@@ -1,45 +1,87 @@
-//TODO: Import necessary modules
-const express = require('express');
-const path = require('path');
-const fs = require('fs');
 
+// install required packages
+const express = require("express");
+const path = require("path");
+const fs = require("fs");
+const { v4: uuidv4, v4 } = require("uuid");
 
-const uniqid = require("uniqid");
+// PORT number
+const PORT = 3001;
 
-const PORT = process.env.PORT || 3001;
-
+// Initialize Express app
 const app = express();
 
-//TODO: Middlewares for parsing request bodies
+//add middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
 
-// TODO: GET route for reading html files 
-
+app.use(express.static("public"));
 
 
-// TODO: GET route for reading notes.html file 
+//use GET route to send the notes.html file to the client
+app.get("/notes", (req, res) => {
+  res.sendFile(path.join(__dirname, "/public/notes.html"));
+});
 
+// POST route to save a new note
+app.post('api/notes', (req, res) => {
+  fs.readFile('.db/db.json', 'utf8', (err, data) => {
+    const {title, text} = req.body;
+      if(req.body){
+        const newParsedNote = {
+          title,
+          text,
+          id: uuidv4(),
+        };
+        const db = JSON.parse(data);
+        db.push(newParsedNote);
+        fs.writeFile('.db/db.json', JSON.stringify(db), 'utf8', (err) => {
+          console.log(err);
+        });
+        res.json(newParsedNote);
+      }
+        });
+      });
 
-// TODO: POST route for creating a new note
+ // use GET route to get all notes
+ app.get('/api/notes', (req, res) => {
+  fs.readFile('./db/db.json', 'utf8', (err, data) => {
+    if (err) throw err;
+    res.json(JSON.parse(data));
+  });
+});
 
+// use GET route to get a single note by id
+app.get('/api/notes/:id', (req, res) => {
+  fs.readFile('./db/db.json', 'utf8', (err, data) => {
+    if (err){
+      console.error(err);
+    }
+    const singleNote = JSON.parse(data);
 
-    //TODO: GET route for reading all notes
+    const note = singleNote.find((note) => note.id === req.params.id);
+    if (!note) {
+      return res.json('Note not found');
+    }
+  });
+});
 
+//use DELETE route to delete a note by id
+app.delete('/api/notes/:id', (req, res) => {
+  const noteId = req.params.id;
+  fs.readFile('./db/db.json', 'utf8', (err, data) => {
+    if(err) throw err;
+    const emptyNotes = JSON.parse(data);
+    const updatedNotes = emptyNotes.filter((note) => note.id!== noteId);
+    fs.writeFile('./db/db.json', JSON.stringify(updatedNotes), 'utf8', (err) => {
+      if (err) throw err;
+      res.json('Note deleted successfully');
+    });
+  })});
 
-    // TODO: DELETE route for deleting a note
+  //add listening to the server
+  app.listen(PORT, () => {
+    console.log(`Server is running on port http://localhost:${PORT}`);
+  });
 
-
-    // TODO: GET route for retrieving a single note by ID
-
-
-
-    // TODO: PUT route for updating a note
-
-        // TODO: Start the server
-
-
-
-
-
+// End of the file
