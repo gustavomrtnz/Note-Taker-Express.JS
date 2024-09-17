@@ -4,9 +4,9 @@
 This application allows small users to be able to write and save notes with a title and a description of the written note. The application also allows the user/ small business to be able o delete a note that serves the purpose to keep track of completed notes. This "Note-Take" can be served as a task manager by adding tasks with descriptions and deleted once they are completed.
 
 ## Table of Contents
-- [User Instructions](##User-Instructions)
-- [Challenges Faced](##What-I-Learned)
-- [Documentation](##Documentation)
+- [User Instructions](#User-Instructions)
+- [What I Learned](#What-I-Learned)
+- [Documentation](#Documentation)
 
 ## User Instructions
 - Clone repo code
